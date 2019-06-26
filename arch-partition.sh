@@ -1,12 +1,15 @@
 #!/bin/sh
 
+echo ''
+echo '   Setting up partitioning...'
+echo ''
+
 memtotal=$(awk '/MemTotal/{print $2}' /proc/meminfo)
 
 psd=$1
 vname=$2
 vpwd=$3
 
-echo '   Setting up partitioning...'
 
 fdisk "$psd" < ./partition-scheme.fdisk
 

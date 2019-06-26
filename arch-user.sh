@@ -1,17 +1,24 @@
 #!/bin/sh
 
-ARG_USERNAME=$1
-
-ARCH_USERNAME=''
-
 echo ''
 echo '   Setting up first user...'
+echo ''
 
+
+### Initialize arguments
+ARG_USERNAME=$1
+
+
+### Verify and install sudo
 pacman -Qkq sudo 2> /dev/null
 
 if [ ! $? = 0 ]; then
   pacman -Sy sudo
 fi
+
+
+### Create user
+ARCH_USERNAME=''
 
 while [ -z "$ARCH_USERNAME" ]; do
   printf 'Username: '
@@ -31,6 +38,8 @@ while [ -z "$ARCH_USERNAME" ]; do
   fi
 done
 
+
+### Set password
 PASSWD_RESULT=1
 
 while [ ! $PASSWD_RESULT = 0 ]; do
@@ -39,6 +48,10 @@ while [ ! $PASSWD_RESULT = 0 ]; do
   PASSWD_RESULT=$?
 done
 
+
+### Configure wheel group access to sudo
 sed -i 's/^# %wheel ALL=(ALL) ALL$/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
+
+### Lock root account
 passwd -l -q root

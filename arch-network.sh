@@ -1,11 +1,13 @@
 #!/bin/sh
 
-### Parse arguments
+echo ''
+echo '   Setting up networking...'
+echo ''
+
+
+### Initialize arguments
 hostname=$1
 localdomain=$2
-
-echo ''
-echo '   Setting up networking..."
 
 ### Generate hosts file
 cat << HOSTS > /etc/hosts

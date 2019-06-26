@@ -1,5 +1,11 @@
 #!/bin/sh
 
+echo ''
+echo '   Starting arch-install...'
+echo ''
+
+
+### Initialize arguments
 ARCH_INSTALL_CHARACTER_SET=''
 ARCH_INSTALL_ENCRYPTED_VOLUME_PASSWORD=''
 ARCH_INSTALL_HOSTNAME=''
@@ -100,23 +106,11 @@ uuid=$(lsblk -o PATH,UUID | awk -v stg="${ARCH_INSTALL_PERSISTENT_STORAGE_DEVICE
 initrd='initrd /initramfs-linux.img'
 
 if [ -n "$(awk '($1 == "vendor_id" && $3 == "GenuineIntel") {print 1}' < /proc/cpuinfo)" ]; then
-  ARCH_INSTALL_PACKAGES="\
-$ARCH_INSTALL_PACKAGES
-intel-ucode"
-
-  initrd="\
-initrd /intel-ucode.img
-$initrd"
-
+  ARCH_INSTALL_PACKAGES="${ARCH_INSTALL_PACKAGES}\nintel-ucode"
+  initrd="initrd /intel-ucode.img\n$initrd"
 elif [ -n "$(awk '($1 == "vendor_id" && $3 == "AuthenticAMD") {print 1}' < /proc/cpuinfo)" ]; then
-  ARCH_INSTALL_PACKAGES="\
-$ARCH_INSTALL_PACKAGES
-amd-ucode"
-
-  initrd="\
-initrd /amd-ucode.img
-$initrd"
-
+  ARCH_INSTALL_PACKAGES="${ARCH_INSTALL_PACKAGES}\namd-ucode"
+  initrd="initrd /amd-ucode.img\n$initrd"
 fi
 
 echo "$ARCH_INSTALL_PACKAGES" | pacstrap /mnt -
