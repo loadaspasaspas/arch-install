@@ -4,6 +4,8 @@
 hostname=$1
 localdomain=$2
 
+echo ''
+echo '   Setting up networking..."
 
 ### Generate hosts file
 cat << HOSTS > /etc/hosts
@@ -45,6 +47,6 @@ systemctl enable systemd-resolved
 
 
 ### Enable available interfaces
-for interface in $(ip link | awk '($2 ~ /^(en|wl)/) {print substr($2, 1, length($2) - 1)}'); do
-  ip link set "$interface" up
+for i in $(ip link | awk '($2 ~ /^(en|wl)/) {print substr($2, 1, length($2) - 1)}'); do
+  ip link set "$i" up
 done

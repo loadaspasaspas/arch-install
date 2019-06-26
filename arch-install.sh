@@ -7,12 +7,10 @@ ARCH_INSTALL_KEYMAP=''
 ARCH_INSTALL_LOCAL_DOMAIN=''
 ARCH_INSTALL_LOCALE=''
 ARCH_INSTALL_LOCALTIME=''
+ARCH_INSTALL_PACKAGES='base'
 ARCH_INSTALL_PERSISTENT_STORAGE_DEVICE=''
 ARCH_INSTALL_USERNAME=''
 
-ARCH_INSTALL_PACKAGES='base'
-ARCH_INSTALL_PACKAGES="$ARCH_INSTALL_PACKAGES
-sudo"
 
 while [ -z "$ARCH_INSTALL_KEYMAP" ]; do 
   printf 'Keyboard layout: '
@@ -25,16 +23,6 @@ while [ -z "$ARCH_INSTALL_KEYMAP" ]; do
 done
 
 loadkeys $ARCH_INSTALL_KEYMAP
-
-while [ -z "$ARCH_INSTALL_LOCALTIME" ]; do
-  printf 'Local time zone: '
-  read -r ARCH_INSTALL_LOCALTIME
-
-  if [ ! -e "/usr/share/zoneinfo/${ARCH_INSTALL_LOCALTIME}" ]; then
-    ARCH_INSTALL_LOCALTIME=''
-    echo 'Time zone not found.'
-  fi
-done
 
 while [ -z "$ARCH_INSTALL_LOCALE" ]; do
   printf 'Locale: '
@@ -56,14 +44,14 @@ while [ -z "$ARCH_INSTALL_CHARACTER_SET" ]; do
   fi
 done
 
-while [ -z "$ARCH_INSTALL_HOSTNAME" ]; do
-  printf 'Hostname: '
-  read -r ARCH_INSTALL_HOSTNAME
-done
+while [ -z "$ARCH_INSTALL_LOCALTIME" ]; do
+  printf 'Local time zone: '
+  read -r ARCH_INSTALL_LOCALTIME
 
-while [ -z "$ARCH_INSTALL_LOCAL_DOMAIN" ]; do
-  printf 'Local domain: '
-  read -r ARCH_INSTALL_LOCAL_DOMAIN
+  if [ ! -e "/usr/share/zoneinfo/${ARCH_INSTALL_LOCALTIME}" ]; then
+    ARCH_INSTALL_LOCALTIME=''
+    echo 'Time zone not found.'
+  fi
 done
 
 while [ -z "$ARCH_INSTALL_PERSISTENT_STORAGE_DEVICE" ]; do
@@ -93,6 +81,16 @@ while [ -z "$ARCH_INSTALL_ENCRYPTED_VOLUME_PASSWORD" ]; do
   fi
 done
 
+while [ -z "$ARCH_INSTALL_HOSTNAME" ]; do
+  printf 'Hostname: '
+  read -r ARCH_INSTALL_HOSTNAME
+done
+
+while [ -z "$ARCH_INSTALL_LOCAL_DOMAIN" ]; do
+  printf 'Local domain: '
+  read -r ARCH_INSTALL_LOCAL_DOMAIN
+done
+
 timedatectl set-ntp true
 
 ./arch-partition.sh "$ARCH_INSTALL_PERSISTENT_STORAGE_DEVICE" "$ARCH_INSTALL_HOSTNAME" "$ARCH_INSTALL_ENCRYPTED_VOLUME_PASSWORD"
@@ -102,15 +100,23 @@ uuid=$(lsblk -o PATH,UUID | awk -v stg="${ARCH_INSTALL_PERSISTENT_STORAGE_DEVICE
 initrd='initrd /initramfs-linux.img'
 
 if [ -n "$(awk '($1 == "vendor_id" && $3 == "GenuineIntel") {print 1}' < /proc/cpuinfo)" ]; then
-  ARCH_INSTALL_PACKAGES="$ARCH_INSTALL_PACKAGES
+  ARCH_INSTALL_PACKAGES="\
+$ARCH_INSTALL_PACKAGES
 intel-ucode"
-  initrd="initrd /intel-ucode.img
+
+  initrd="\
+initrd /intel-ucode.img
 $initrd"
+
 elif [ -n "$(awk '($1 == "vendor_id" && $3 == "AuthenticAMD") {print 1}' < /proc/cpuinfo)" ]; then
-  ARCH_INSTALL_PACKAGES="$ARCH_INSTALL_PACKAGES
+  ARCH_INSTALL_PACKAGES="\
+$ARCH_INSTALL_PACKAGES
 amd-ucode"
-  initrd="initrd /amd-ucode.img
+
+  initrd="\
+initrd /amd-ucode.img
 $initrd"
+
 fi
 
 echo "$ARCH_INSTALL_PACKAGES" | pacstrap /mnt -
@@ -160,7 +166,7 @@ mkinitcpio -p linux
 
 /root/arch-network.sh ${ARCH_INSTALL_HOSTNAME} ${ARCH_INSTALL_LOCAL_DOMAIN}
 
-/root/arch-user.sh ${ARCH_INSTALL_USERNAME}
+/root/arch-firstuser.sh
 SETUP
 
 chmod +x /mnt/root/arch-setup.sh
@@ -169,8 +175,8 @@ cp ./arch-*.sh /mnt/root/
 
 arch-chroot /mnt /root/arch-setup.sh
 
-#rm /mnt/root/arch-*.sh
+rm /mnt/root/arch-*.sh
 
-#umount -R /mnt
+umount -R /mnt
 
-#reboot
+reboot

@@ -6,6 +6,8 @@ psd=$1
 vname=$2
 vpwd=$3
 
+echo '   Setting up partitioning...'
+
 fdisk "$psd" < ./partition-scheme.fdisk
 
 printf '%s' "$vpwd" | cryptsetup luksFormat "${psd}"2 -
