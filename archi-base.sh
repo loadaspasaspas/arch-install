@@ -147,7 +147,7 @@ cat <<ENTRY > /boot/loader/entries/${uuid}.conf
 title Arch Linux
 linux /vmlinuz-linux
 $initrd
-options cryptdevice=UUID=${uuid}:cryptlvm resume=/dev/${ARCH_INSTALL_HOSTNAME}/swap root=/dev/${ARCH_INSTALL_HOSTNAME}/root
+options cryptdevice=UUID=${uuid}:cryptlvm resume=/dev/${ARCH_INSTALL_HOSTNAME}/swap root=/dev/${ARCH_INSTALL_HOSTNAME}/root rw quiet
 ENTRY
 
 cat <<LOADER > /boot/loader/loader.conf

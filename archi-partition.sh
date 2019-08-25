@@ -63,15 +63,17 @@ prompt_volume_name() {
 }
 
 prompt_volume_password() {
-    printf 'Encrypted volume password: '
     stty -echo
+
+    printf 'Encrypted volume password: '
     read -r AI_VOLUME_PASSWORD
     echo ''
 
     printf 'Confirm encrypted volume password: '
     read -r AI_VOLUME_PASSWORD_CONFIRM
-    stty echo
     echo ''
+
+    stty echo
 }
 
 valid_persistent_storage_device() {
@@ -111,7 +113,7 @@ _MEMTOTAL=$(awk '/MemTotal/{print $2}' /proc/meminfo)
 
 ### Generate and configure partition
 
- fdisk "$_PERSISTENT_STORAGE_DEVICE" < ./partition-scheme.fdisk
+fdisk "$_PERSISTENT_STORAGE_DEVICE" < ./partition-scheme.fdisk
 
 printf '%s' "$_VOLUME_PASSWORD" | cryptsetup luksFormat "${_PERSISTENT_STORAGE_DEVICE}2" -
 printf '%s' "$_VOLUME_PASSWORD" | cryptsetup --key-file - luksOpen "${_PERSISTENT_STORAGE_DEVICE}2" cryptlvm

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo ''
-echo '   Setting up first user...'
+echo '   Setting up user...'
 echo ''
 
 
